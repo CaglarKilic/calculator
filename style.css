@@ -1,0 +1,39 @@
+/* --- Frame --- */
+
+body {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.copy {
+    height: 87%;
+    position: absolute;
+    z-index: -1;
+}
+
+img {
+    height: 100%;
+    width: auto;
+}
+
+.container {
+    height: 87%;
+    aspect-ratio: 7/16;
+    background-color: gray;
+    opacity: 0.5;
+    display: grid;
+    grid-template-rows: 0.62fr 1fr;
+}
+
+.keypad {
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 6.5vh;
+}
+
+/* --- Buttons --- */
