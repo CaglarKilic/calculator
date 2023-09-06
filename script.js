@@ -1,21 +1,42 @@
 const MAX_DIGIT = 9
 const BOARD = document.querySelector('p')
 const WIDTH = BOARD.parentElement.offsetWidth
+let FLAG_DECIMAL = false
 
 function writeDigit() {
-    let prompt = (BOARD.textContent + this.textContent).replace(/,/g, '')
-    if (prompt.length == 10) {
+    let prompt = (BOARD.textContent + this.textContent)
+
+    if (this.textContent == '.') {
+        if (!FLAG_DECIMAL) {
+            BOARD.textContent = prompt
+            FLAG_DECIMAL = true
+        }
         return
     }
-    BOARD.textContent = parseInt(prompt).toLocaleString('en-US')
+
+
+    if (countDigits(prompt) > MAX_DIGIT) {
+        return
+    }
+
+    console.log(prompt)
+    BOARD.textContent = parseFloat(prompt.replace(/,/g, '')).toLocaleString('en-US', { maximumFractionDigits: 10 })
     dynamicFontSize()
 }
 
-function setUpButtons() {
+function setUpDigitButtons() {
     let numbers = document.querySelectorAll('.number')
     numbers.forEach(number => {
         number.addEventListener('click', writeDigit)
     })
+}
+
+function countDigits(s) {
+    return s.replace(/[,\.]/g, '').length
+}
+
+function setUpDecimalButton() {
+    document.querySelector('.decimal').addEventListener('click', writeDecimal)
 }
 
 function getFontSize(element) {
@@ -29,5 +50,5 @@ function dynamicFontSize() {
     }
 }
 
-setUpButtons()
+setUpDigitButtons()
 
