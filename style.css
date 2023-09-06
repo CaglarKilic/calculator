@@ -40,7 +40,7 @@ img {
 
 /* --- Buttons --- */
 
-.ellipse {
+#ellipse {
     grid-column-end: span 2;
     border-style: none;
     border-radius: 3vw;
@@ -59,8 +59,8 @@ img {
     background-color: #a5a5a5;
     color: black;
 }
-
-.number {
+ 
+.number, #decimal{
     background-color: #333333;
     color: white;
 }
@@ -74,13 +74,15 @@ img {
 
 .screen {
     font-size: 7.5vh;
-    color: white;
     display: flex;
-    align-items: end;
     justify-content: end;
+    align-items: end;
+    color: white;
     font-weight: lighter;
+    margin-bottom: 3%;
+    margin-right: 3%;
 }
 
 p {
-    margin: 0.1em;
+    margin: 0
 }

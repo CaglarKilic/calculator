@@ -1,54 +1,87 @@
 const MAX_DIGIT = 9
 const BOARD = document.querySelector('p')
-const WIDTH = BOARD.parentElement.offsetWidth
+const WIDTH = BOARD.parentElement.offsetWidth * 0.97
+let FLAG_DECREMENT = false
 let FLAG_DECIMAL = false
+let FLAG_NEGATE = false
 
 function writeDigit() {
-    let prompt = (BOARD.textContent + this.textContent)
-
-    if (this.textContent == '.') {
-        if (!FLAG_DECIMAL) {
-            BOARD.textContent = prompt
-            FLAG_DECIMAL = true
-        }
+    if (countDigits() == MAX_DIGIT) {
         return
     }
 
-
-    if (countDigits(prompt) > MAX_DIGIT) {
-        return
-    }
-
-    console.log(prompt)
+    let prompt = BOARD.textContent + this.textContent
     BOARD.textContent = parseFloat(prompt.replace(/,/g, '')).toLocaleString('en-US', { maximumFractionDigits: 10 })
-    dynamicFontSize()
+    console.log(BOARD.offsetWidth, WIDTH)
+    decrementFontSize()
+    console.log(BOARD.offsetWidth, WIDTH)
 }
 
-function setUpDigitButtons() {
+function writeDecimal() {
+    if ((countDigits() == MAX_DIGIT) || FLAG_DECIMAL) {
+        return
+    }
+
+    BOARD.textContent += this.textContent
+    FLAG_DECIMAL = true
+    decrementFontSize()
+}
+
+function writeNegate() {
+    if (!FLAG_NEGATE) {
+        BOARD.textContent = '-' + BOARD.textContent
+        decrementFontSize()
+    } else {
+        BOARD.textContent = BOARD.textContent.slice(1)
+        incrementFontSize()
+    }
+
+    FLAG_NEGATE = !FLAG_NEGATE
+}
+
+function initButtons() {
+    //Numbers
     let numbers = document.querySelectorAll('.number')
     numbers.forEach(number => {
         number.addEventListener('click', writeDigit)
     })
+
+    //Decimal
+    document.querySelector('#decimal').addEventListener('click', writeDecimal)
+
+    //Negate 
+    document.querySelector('#negate').addEventListener('click', writeNegate)
+
+    //AC
+
+
 }
 
-function countDigits(s) {
-    return s.replace(/[,\.]/g, '').length
-}
-
-function setUpDecimalButton() {
-    document.querySelector('.decimal').addEventListener('click', writeDecimal)
+function countDigits() {
+    return BOARD.textContent.replace(/[,\.\-]/g, '').length
 }
 
 function getFontSize(element) {
     return parseInt(window.getComputedStyle(element).fontSize)
 }
 
-function dynamicFontSize() {
+function decrementFontSize() {
     while (BOARD.offsetWidth > WIDTH) {
-        let size = getFontSize(BOARD)
-        BOARD.style.fontSize = Math.floor(WIDTH / BOARD.offsetWidth * size) - 2 + 'px'
+        let size = getFontSize(BOARD) - 1
+        BOARD.style.fontSize = size + 'px'
+        FLAG_DECREMENT = true
     }
 }
 
-setUpDigitButtons()
+function incrementFontSize() {
+    if (FLAG_DECREMENT) {
+        while (BOARD.offsetWidth < WIDTH - 5) {
+            let size = getFontSize(BOARD) + 1
+            BOARD.style.fontSize = size + 'px'
+        }
+        FLAG_DECREMENT = false
+    }
+}
+
+initButtons()
 
