@@ -44,6 +44,8 @@ img {
     grid-column-end: span 2;
     border-style: none;
     border-radius: 3vw;
+    font-size: 1em;
+    font-weight: bolder;
 }
 
 .button {
@@ -66,4 +68,19 @@ img {
 .op {
     background-color: #fea00a;
     color: white;
+}
+
+/* ---screen--- */
+
+.screen {
+    font-size: 7.5vh;
+    color: white;
+    display: flex;
+    align-items: end;
+    justify-content: end;
+    font-weight: lighter;
+}
+
+p {
+    margin: 0.1em;
 }
