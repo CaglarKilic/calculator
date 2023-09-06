@@ -23,8 +23,8 @@ img {
 .container {
     height: 87%;
     aspect-ratio: 7/16;
-    background-color: gray;
-    opacity: 0.5;
+    background-color: black;
+    opacity: 1;
     display: grid;
     grid-template-rows: 0.62fr 1fr;
 }
@@ -34,10 +34,36 @@ img {
     grid-template-rows: repeat(5, 1fr);
     grid-template-columns: repeat(4, 1fr);
     margin-bottom: 6.5vh;
+    gap: 1vw;
+    font-size: 2.5vh;
 }
 
 /* --- Buttons --- */
 
 .ellipse {
     grid-column-end: span 2;
+    border-style: none;
+    border-radius: 3vw;
+}
+
+.button {
+    border-radius: 50%;
+    border-style: none;
+    font-size: 1em;
+    font-weight: bolder;
+}
+
+.top {
+    background-color: #a5a5a5;
+    color: black;
+}
+
+.number {
+    background-color: #333333;
+    color: white;
+}
+
+.op {
+    background-color: #fea00a;
+    color: white;
 }
