@@ -37,3 +37,7 @@ img {
 }
 
 /* --- Buttons --- */
+
+.ellipse {
+    grid-column-end: span 2;
+}
