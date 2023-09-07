@@ -2,41 +2,48 @@ const MAX_DIGIT = 9
 const BOARD = document.querySelector('p')
 const WIDTH = BOARD.parentElement.offsetWidth * 0.97
 let FLAG_DECREMENT = false
-let FLAG_DECIMAL = false
 let FLAG_NEGATE = false
+let FLAG_OPERATE = false
 
 function writeDigit() {
     if (countDigits() == MAX_DIGIT) {
         return
     }
 
-    let prompt = BOARD.textContent + this.textContent
-    BOARD.textContent = parseFloat(prompt.replace(/,/g, '')).toLocaleString('en-US', { maximumFractionDigits: 10 })
-    console.log(BOARD.offsetWidth, WIDTH)
-    decrementFontSize()
-    console.log(BOARD.offsetWidth, WIDTH)
-}
-
-function writeDecimal() {
-    if ((countDigits() == MAX_DIGIT) || FLAG_DECIMAL) {
-        return
-    }
-
-    BOARD.textContent += this.textContent
-    FLAG_DECIMAL = true
+    output(readScreen() + this.textContent)
     decrementFontSize()
 }
 
 function writeNegate() {
     if (!FLAG_NEGATE) {
-        BOARD.textContent = '-' + BOARD.textContent
+        output('-' + readScreen())
         decrementFontSize()
     } else {
-        BOARD.textContent = BOARD.textContent.slice(1)
+        output(readScreen().slice(1))
         incrementFontSize()
     }
 
     FLAG_NEGATE = !FLAG_NEGATE
+}
+
+function clearScreen() {
+    BOARD.textContent = '0'
+}
+
+function output(number) {
+    let afterParse = ''
+    let last = number.match(/\.$/)
+    let count = number.match(/\./g)
+    let lastTwo = number.match(/..$/)
+
+    if (last && count.length == 1) { afterParse = '.' }
+    if (lastTwo == '.0') { afterParse = lastTwo }
+
+    BOARD.textContent = parseFloat(number.replace(/,/g, '')).toLocaleString('en-US', { maximumFractionDigits: 10 }) + afterParse
+}
+
+function readScreen() {
+    return BOARD.textContent
 }
 
 function initButtons() {
@@ -46,19 +53,22 @@ function initButtons() {
         number.addEventListener('click', writeDigit)
     })
 
-    //Decimal
-    document.querySelector('#decimal').addEventListener('click', writeDecimal)
-
     //Negate 
     document.querySelector('#negate').addEventListener('click', writeNegate)
 
     //AC
+    document.querySelector('#ac').addEventListener('click', clearScreen)
 
+    //+
+    document.querySelector('#add').addEventListener('click', operate)
+}
+
+function operate() {
 
 }
 
 function countDigits() {
-    return BOARD.textContent.replace(/[,\.\-]/g, '').length
+    return readScreen().replace(/[,\.\-]/g, '').length
 }
 
 function getFontSize(element) {
@@ -81,6 +91,10 @@ function incrementFontSize() {
         }
         FLAG_DECREMENT = false
     }
+}
+
+function add(a, b) {
+    return a + b
 }
 
 initButtons()

@@ -34,8 +34,8 @@ img {
     grid-template-rows: repeat(5, 1fr);
     grid-template-columns: repeat(4, 1fr);
     margin-bottom: 6.5vh;
-    gap: 1vw;
-    font-size: 2.5vh;
+    gap: 1vh;
+    font-size: 3.5vh;
 }
 
 /* --- Buttons --- */
@@ -60,7 +60,7 @@ img {
     color: black;
 }
  
-.number, #decimal{
+.number{
     background-color: #333333;
     color: white;
 }
@@ -68,6 +68,13 @@ img {
 .op {
     background-color: #fea00a;
     color: white;
+    transition: background-color 0.5s;
+}
+
+.op:focus {
+    background-color: white;
+    color: #fea00a;
+    transition: background-color 0.5s;
 }
 
 /* ---screen--- */
