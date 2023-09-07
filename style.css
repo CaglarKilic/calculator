@@ -65,13 +65,13 @@ img {
     color: white;
 }
 
-.op {
+.op, #equal{
     background-color: #fea00a;
     color: white;
     transition: background-color 0.5s;
 }
 
-.op:focus {
+.op:focus, #equal:active{
     background-color: white;
     color: #fea00a;
     transition: background-color 0.5s;

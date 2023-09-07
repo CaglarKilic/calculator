@@ -4,6 +4,9 @@ const WIDTH = BOARD.parentElement.offsetWidth * 0.97
 let FLAG_DECREMENT = false
 let FLAG_NEGATE = false
 let FLAG_OPERATE = false
+let lValue = 0
+let rValue = 0
+let total = 0
 
 function writeDigit() {
     if (countDigits() == MAX_DIGIT) {
@@ -32,12 +35,13 @@ function clearScreen() {
 
 function output(number) {
     let afterParse = ''
-    let last = number.match(/\.$/)
+    let last = number.match(/\.{1,}$/)
     let count = number.match(/\./g)
-    let lastTwo = number.match(/..$/)
+    let lastTwo = number.match(/\.0{1,}\.?/)
 
-    if (last && count.length == 1) { afterParse = '.' }
-    if (lastTwo == '.0') { afterParse = lastTwo }
+
+    if (last && count.length >= 1) { afterParse = '.' }
+    if (lastTwo) { afterParse = lastTwo[0].replace(/\.$/, '')}
 
     BOARD.textContent = parseFloat(number.replace(/,/g, '')).toLocaleString('en-US', { maximumFractionDigits: 10 }) + afterParse
 }
@@ -64,6 +68,13 @@ function initButtons() {
 }
 
 function operate() {
+    const mode = this.textContent
+
+    switch (mode) {
+        case '+':
+            lValue = parseFloat(readScreen().replace())
+    }
+    if (!FLAG_OPERATE) { FLAG_OPERATE = !FLAG_OPERATE }
 
 }
 
