@@ -35,13 +35,14 @@ function clearScreen() {
 
 function output(number) {
     let afterParse = ''
-    let last = number.match(/\.{1,}$/)
+    let last = number.match(/\.$/)
     let count = number.match(/\./g)
-    let lastTwo = number.match(/\.0{1,}\.?/)
+    let dotPrevZero = number.match(/\.0{1,}$/);
+    let zero = number.match(/\..+0{1,}$/);
 
-
-    if (last && count.length >= 1) { afterParse = '.' }
-    if (lastTwo) { afterParse = lastTwo[0].replace(/\.$/, '')}
+    if (last && count.length == 1) { afterParse = '.' }
+    if (dotPrevZero) { afterParse = dotPrevZero }
+    else if (zero) { afterParse = zero[0].match(/0+$/) }
 
     BOARD.textContent = parseFloat(number.replace(/,/g, '')).toLocaleString('en-US', { maximumFractionDigits: 10 }) + afterParse
 }
