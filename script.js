@@ -4,26 +4,28 @@ const WIDTH = BOARD.parentElement.offsetWidth * 0.97
 let FLAG_DECREMENT = false
 let FLAG_NEGATE = false
 let FLAG_OPERATE = false
+let FLAG_PRECEDENCE = false
 let lValue = 0
 let rValue = 0
 let total = 0
 
 function writeDigit() {
-    if (countDigits() == MAX_DIGIT) {
-        return
+    if (FLAG_OPERATE) {
+        clearScreen()
+        rValue = parseNumber(readScreen())
+        FLAG_OPERATE = !FLAG_OPERATE
     }
 
+    if (countDigits() == MAX_DIGIT) { return }
+
     output(readScreen() + this.textContent)
-    decrementFontSize()
 }
 
 function writeNegate() {
     if (!FLAG_NEGATE) {
         output('-' + readScreen())
-        decrementFontSize()
     } else {
-        output(readScreen().slice(1))
-        incrementFontSize()
+        output(readScreen().slice(1), 0)
     }
 
     FLAG_NEGATE = !FLAG_NEGATE
@@ -33,22 +35,27 @@ function clearScreen() {
     BOARD.textContent = '0'
 }
 
-function output(number) {
+function output(number, fontSize = 1) {
     let afterParse = ''
-    let last = number.match(/\.$/)
-    let count = number.match(/\./g)
-    let dotPrevZero = number.match(/\.0{1,}$/);
-    let zero = number.match(/\..+0{1,}$/);
+    let a = number.match(/\.\.?$/)
+    let b = number.match(/\..+\.$/)
+    let c = number.match(/\..*0{1,}\.?$/)
 
-    if (last && count.length == 1) { afterParse = '.' }
-    if (dotPrevZero) { afterParse = dotPrevZero }
-    else if (zero) { afterParse = zero[0].match(/0+$/) }
+    if (a) {afterParse = '.'}
+    if (b) {afterParse = ''}
+    if (c) {afterParse = number.match(/0{1,}\.?$/)[0].replace('.', '')}
 
-    BOARD.textContent = parseFloat(number.replace(/,/g, '')).toLocaleString('en-US', { maximumFractionDigits: 10 }) + afterParse
+    BOARD.textContent = parseNumber(number).toLocaleString('en-US', { maximumFractionDigits: 10 }) + afterParse
+
+    if (fontSize == 1) { decrementFontSize() } else { incrementFontSize() }
 }
 
 function readScreen() {
     return BOARD.textContent
+}
+
+function parseNumber(nString) {
+    return parseFloat(nString.replace(/,/g, ''))
 }
 
 function initButtons() {
@@ -73,10 +80,12 @@ function operate() {
 
     switch (mode) {
         case '+':
-            lValue = parseFloat(readScreen().replace())
-    }
-    if (!FLAG_OPERATE) { FLAG_OPERATE = !FLAG_OPERATE }
+            lValue = parseNumber(readScreen())
+            total += lValue
+            break
+        case '=':
 
+    }
 }
 
 function countDigits() {
@@ -105,9 +114,5 @@ function incrementFontSize() {
     }
 }
 
-function add(a, b) {
-    return a + b
-}
 
 initButtons()
-
