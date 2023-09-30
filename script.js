@@ -37,6 +37,7 @@ function writeNegate() {
 
 
 function clearScreen() {
+    if (this.textContent) { exp = '' }
     BOARD.textContent = '0'
 }
 

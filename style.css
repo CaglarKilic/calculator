@@ -58,23 +58,35 @@ img {
 .top {
     background-color: #a5a5a5;
     color: black;
-}
- 
-.number{
-    background-color: #333333;
-    color: white;
+    transition-duration: 0.3s;
 }
 
-.op, #equal{
+.number {
+    background-color: #333333;
+    color: white;
+    transition-duration: 0.3s;
+}
+
+.op,
+#equal {
     background-color: #fea00a;
     color: white;
     transition: background-color 0.5s;
 }
 
-.op:focus, #equal:active{
+.op:focus,
+#equal:active {
     background-color: white;
     color: #fea00a;
     transition: background-color 0.5s;
+}
+
+.number:active {
+    background-color: gray;
+}
+
+.top:active {
+    background-color: white;
 }
 
 /* ---screen--- */
