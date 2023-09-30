@@ -71,14 +71,13 @@ img {
 #equal {
     background-color: #fea00a;
     color: white;
-    transition: background-color 0.5s;
+    transition: 0.5s;
 }
 
 .op:focus,
 #equal:active {
     background-color: white;
     color: #fea00a;
-    transition: background-color 0.5s;
 }
 
 .number:active {

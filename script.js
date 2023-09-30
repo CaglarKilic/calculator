@@ -4,6 +4,7 @@ const WIDTH = BOARD.parentElement.offsetWidth * 0.97
 let FLAG_DECREMENT = false
 let FLAG_NEGATE = false
 let FLAG_OPERATE = false
+let fcs = null
 let exp = ''
 const arithmetic = {
     '+': (a, b) => a + b,
@@ -25,12 +26,22 @@ function writeDigit() {
 }
 
 
-function writeNegate() {
+function writeNegate(event) {
+    if (event.type == 'focusin' && fcs) {
+        fcs.focus()
+        return
+    }
+
     if (!FLAG_NEGATE) {
-        output('-' + readScreen())
+        if (FLAG_OPERATE) {
+            output('-0')
+            FLAG_OPERATE = false
+        }
+        else { output('-' + readScreen()) }
     } else {
         output(readScreen().slice(1), 0)
     }
+
 
     FLAG_NEGATE = !FLAG_NEGATE
 }
@@ -78,7 +89,9 @@ function initButtons() {
     })
 
     //Negate 
-    document.querySelector('#negate').addEventListener('click', writeNegate)
+    let negate = document.querySelector('#negate')
+    negate.addEventListener('focusin', writeNegate)
+    negate.addEventListener('click', writeNegate)
 
     //AC
     document.querySelector('#ac').addEventListener('click', clearScreen)
@@ -96,6 +109,7 @@ function operate() {
     if (!FLAG_OPERATE) { exp = exp + parseNumber(readScreen()) }
     if (FLAG_NEGATE) { FLAG_NEGATE = false }
     FLAG_OPERATE = true
+    fcs = this
     exp = (exp.match(/\d$/)) ? (exp + this.textContent) : (exp.replace(/.$/, this.textContent))// add or replace operator
     let result = evalExp()
     console.log(exp)
