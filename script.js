@@ -4,9 +4,13 @@ const WIDTH = BOARD.parentElement.offsetWidth * 0.97
 let FLAG_DECREMENT = false
 let FLAG_NEGATE = false
 let FLAG_OPERATE = false
-let mem = 0
-let op = ''
 let exp = ''
+const arithmetic = {
+    '+': (a, b) => a + b,
+    '-': (a, b) => a - b,
+    '*': (a, b) => a * b,
+    '/': (a, b) => a / b
+}
 
 
 function writeDigit() {
@@ -88,11 +92,12 @@ function initButtons() {
 
 
 function operate() {
-    if (!FLAG_OPERATE) { exp += parseNumber(readScreen()).toString() }
+    if (!FLAG_OPERATE) { exp = exp + parseNumber(readScreen()) }
     FLAG_OPERATE = true
-    op = this.textContent
-    exp = parseExp(exp, op)
+    exp = (exp.match(/\d$/)) ? (exp + this.textContent) : (exp.replace(/.$/, this.textContent))// add or replace operator
+    let result = evalExp()
     console.log(exp)
+    output(result + '')
 }
 
 
@@ -126,14 +131,57 @@ function incrementFontSize() {
 }
 
 
-function parseExp(str, op) {
-    str = str.match(/\d$/) ? str + op : str.replace(/.$/, op)
-    
-    
+function evalExp() {
+    let ops = exp.match(/[\*\/\+\-=]/g)
+    let len = ops.length
+
+    if (len < 2) { return parseFloat(exp) }
+
+    if (len == 2) {
+        if (ops[0].match(/[\*\/]/) || ops[1] == '=') {
+            let result = calculate(exp.slice(0, -1), 1)
+            return result
+        }
+
+        if (ops[1].match(/[\*\/]/)) {
+            return parseFloat(exp.match(/[\d\.]+(?=.$)/))
+        }
+
+        if (ops[1].match(/[\+\-]/)) {
+            let result = calculate(exp.slice(0, -1))
+            return result
+        }
+    }
+
+    if (len == 3) {
+        if (ops[1].match(/[\*\/]/)) {
+            calculate(exp.match(/[\d\.]+[\*\/][\d\.]+/)[0], 1)
+            return evalExp()
+        }
+
+        if (ops[2].match(/[\*\/]/)) {
+            calculate(exp.match(/[\d\.]+.[\d\.]+/)[0], 1)
+            return evalExp()
+        }
+    }
 }
 
-function evalExp(exp) {
 
+function calculate(atom, reduce = 0) {
+    console.log(atom)
+    let sep = /[^\d\.]/
+    let values = atom.split(sep).map(parseFloat)
+    let operator = atom.match(sep)[0]
+
+    let result = arithmetic[operator](values[0], values[1])
+    if (reduce) { reduceExp(atom, result.toString()) }
+
+    return result
+}
+
+
+function reduceExp(atom, result) {
+    exp = exp.replace(atom, result)
 }
 
 
