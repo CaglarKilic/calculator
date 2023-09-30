@@ -7,7 +7,7 @@ let FLAG_OPERATE = false
 let exp = ''
 const arithmetic = {
     '+': (a, b) => a + b,
-    '-': (a, b) => a - b,
+    '\u{2010}': (a, b) => a - b,
     '*': (a, b) => a * b,
     '/': (a, b) => a / b
 }
@@ -94,6 +94,7 @@ function initButtons() {
 
 function operate() {
     if (!FLAG_OPERATE) { exp = exp + parseNumber(readScreen()) }
+    if (FLAG_NEGATE) { FLAG_NEGATE = false }
     FLAG_OPERATE = true
     exp = (exp.match(/\d$/)) ? (exp + this.textContent) : (exp.replace(/.$/, this.textContent))// add or replace operator
     let result = evalExp()
@@ -133,7 +134,7 @@ function incrementFontSize() {
 
 
 function evalExp() {
-    let ops = exp.match(/[\*\/\+\-=]/g)
+    let ops = exp.match(/[\*\/\+\u{2010}=]/gu)
     let len = ops.length
 
     if (len < 2) { return parseFloat(exp) }
@@ -145,10 +146,10 @@ function evalExp() {
         }
 
         if (ops[1].match(/[\*\/]/)) {
-            return parseFloat(exp.match(/[\d\.]+(?=.$)/))
+            return parseFloat(exp.match(/\-?[\d\.]+(?=.$)/))
         }
 
-        if (ops[1].match(/[\+\-]/)) {
+        if (ops[1].match(/[\+\u{2010}]/u)) {
             let result = calculate(exp.slice(0, -1))
             return result
         }
@@ -156,12 +157,12 @@ function evalExp() {
 
     if (len == 3) {
         if (ops[1].match(/[\*\/]/)) {
-            calculate(exp.match(/[\d\.]+[\*\/][\d\.]+/)[0], 1)
+            calculate(exp.match(/\-?[\d\.]+[\*\/]\-?[\d\.]+/)[0], 1)
             return evalExp()
         }
 
         if (ops[2].match(/[\*\/]/)) {
-            calculate(exp.match(/[\d\.]+.[\d\.]+/)[0], 1)
+            calculate(exp.match(/\-?[\d\.]+.\-?[\d\.]+/)[0], 1)
             return evalExp()
         }
     }
@@ -169,8 +170,7 @@ function evalExp() {
 
 
 function calculate(atom, reduce = 0) {
-    console.log(atom)
-    let sep = /[^\d\.]/
+    let sep = /[^\d\.\-]/
     let values = atom.split(sep).map(parseFloat)
     let operator = atom.match(sep)[0]
 
