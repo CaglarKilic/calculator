@@ -27,8 +27,8 @@ function writeDigit() {
 
 
 function writeNegate(event) {
-    if (event.type == 'focusin' && fcs) {
-        fcs.focus()
+    if (event.type == 'focusin') {
+        if (fcs) { fcs.focus() }
         return
     }
 
@@ -41,7 +41,6 @@ function writeNegate(event) {
     } else {
         output(readScreen().slice(1), 0)
     }
-
 
     FLAG_NEGATE = !FLAG_NEGATE
 }
@@ -155,8 +154,7 @@ function evalExp() {
 
     if (len == 2) {
         if (ops[0].match(/[\*\/]/) || ops[1] == '=') {
-            let result = calculate(exp.slice(0, -1), 1)
-            return result
+            return calculate(exp.slice(0, -1), 1)
         }
 
         if (ops[1].match(/[\*\/]/)) {
@@ -164,8 +162,7 @@ function evalExp() {
         }
 
         if (ops[1].match(/[\+\u{2010}]/u)) {
-            let result = calculate(exp.slice(0, -1))
-            return result
+            return calculate(exp.slice(0, -1))
         }
     }
 
