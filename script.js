@@ -4,8 +4,11 @@ const WIDTH = BOARD.parentElement.offsetWidth * 0.97
 let FLAG_DECREMENT = false
 let FLAG_NEGATE = false
 let FLAG_OPERATE = false
-let fcs = null
+let FLAG_REPEAT = false
+let prevop = null
 let exp = ''
+let lastop = '+'
+let mem = '0'
 const arithmetic = {
     '+': (a, b) => a + b,
     '\u{2010}': (a, b) => a - b,
@@ -20,7 +23,10 @@ function writeDigit() {
         FLAG_OPERATE = false
     }
 
-    if (exp.match(/=$/)) { exp = ''}
+    if (exp.match(/=$/)) {
+        exp = ''
+        FLAG_REPEAT = false
+    }
 
     if (countDigits() == MAX_DIGIT) { return }
 
@@ -30,7 +36,7 @@ function writeDigit() {
 
 function writeNegate(event) {
     if (event.type == 'focusin') {
-        if (fcs) { fcs.focus() }
+        if (prevop) { prevop.focus() }
         return
     }
 
@@ -108,10 +114,30 @@ function initButtons() {
 
 function operate() {
     if (!FLAG_OPERATE) { exp = exp + parseNumber(readScreen()) }
-    if (FLAG_NEGATE) { FLAG_NEGATE = false }
     FLAG_OPERATE = true
-    fcs = this
-    exp = (exp.match(/\d$/)) ? (exp + this.textContent) : (exp.replace(/.$/, this.textContent))// add or replace operator
+
+    if (FLAG_NEGATE) { FLAG_NEGATE = false }
+
+    let op = this.textContent
+    if (op != '=') {
+        lastop = op
+        FLAG_REPEAT = false
+    }
+
+    prevop = this
+
+    exp = (exp.match(/\d$/)) ? (exp + op) : (exp.replace(/.$/, op))// add or replace operator
+
+    if (FLAG_REPEAT) {
+        exp = exp.replace('=', lastop + mem + '=')
+        output(evalExp().toString())
+        return
+    }
+
+    mem = exp.match(/[\d\.]+(?=.$)/)[0]
+    
+    if (op == '=') { FLAG_REPEAT = true }
+    
     let result = evalExp()
     console.log(exp)
     output(result + '')
