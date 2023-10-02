@@ -20,6 +20,8 @@ function writeDigit() {
         FLAG_OPERATE = false
     }
 
+    if (exp.match(/=$/)) { exp = ''}
+
     if (countDigits() == MAX_DIGIT) { return }
 
     output(readScreen() + this.textContent)
@@ -172,10 +174,8 @@ function evalExp() {
             return evalExp()
         }
 
-        if (ops[2].match(/[\*\/]/)) {
-            calculate(exp.match(/\-?[\d\.]+.\-?[\d\.]+/)[0], 1)
-            return evalExp()
-        }
+        calculate(exp.match(/\-?[\d\.]+.\-?[\d\.]+/)[0], 1)
+        return evalExp()        
     }
 }
 
