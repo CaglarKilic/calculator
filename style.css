@@ -61,7 +61,8 @@ img {
     transition-duration: 0.3s;
 }
 
-.number {
+.number,
+#decimal {
     background-color: #333333;
     color: white;
     transition-duration: 0.3s;
@@ -80,7 +81,8 @@ img {
     color: #fea00a;
 }
 
-.number:active {
+.number:active,
+#decimal:active {
     background-color: gray;
 }
 
