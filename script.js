@@ -25,10 +25,10 @@ function writeDigit() {
 
     if (exp.match(/=$/)) {
         exp = ''
-        FLAG_REPEAT = false
+        // FLAG_REPEAT = false
     }
 
-    if (countDigits() == MAX_DIGIT) { return }
+    if (countDigits(readScreen()) == MAX_DIGIT) { return }
 
     output(readScreen() + this.textContent)
 }
@@ -70,7 +70,9 @@ function output(number, fontSize = 1) {
     if (b) { afterParse = '' }
     if (c) { afterParse = number.match(/0{1,}\.?$/)[0].replace('.', '') }
 
-    BOARD.textContent = parseNumber(number).toLocaleString('en-US', { maximumFractionDigits: 8 }) + afterParse
+    let options = countDigits(number) > MAX_DIGIT ? {notation: 'scientific'} : {}
+
+    BOARD.textContent = parseNumber(number).toLocaleString('en-US', options) + afterParse
 
     if (fontSize == 1) { decrementFontSize() } else { incrementFontSize() }
 
@@ -129,23 +131,22 @@ function operate() {
     exp = (exp.match(/\d$/)) ? (exp + op) : (exp.replace(/.$/, op))// add or replace operator
 
     if (FLAG_REPEAT) {
-        exp = exp.replace('=', lastop + mem + '=')
+        exp = parseNumber(readScreen()) + lastop + mem + '='
         output(evalExp().toString())
         return
     }
 
-    mem = exp.match(/[\d\.]+(?=.$)/)[0]
+    mem = exp.match(/-?[\d\.]+(?=.$)/)[0]
     
     if (op == '=') { FLAG_REPEAT = true }
     
     let result = evalExp()
-    console.log(exp)
     output(result + '')
 }
 
 
-function countDigits() {
-    return readScreen().replace(/[,\.\-]/g, '').length
+function countDigits(number) {
+    return number.replace(/[,\.\-]/g, '').length
 }
 
 
@@ -175,7 +176,7 @@ function incrementFontSize() {
 
 
 function evalExp() {
-    let ops = exp.match(/[\*\/\+\u{2010}=]/gu)
+    let ops = exp.replace(/^\-/, '').match(/(?:(?<!e)[\+\u{2010}])|[\*\/=]/gu)
     let len = ops.length
 
     if (len < 2) { return parseFloat(exp) }
@@ -207,7 +208,7 @@ function evalExp() {
 
 
 function calculate(atom, reduce = 0) {
-    let sep = /[^\d\.\-]/
+    let sep = /(?:(?<!e)\+)|[\u{2010}\*\/]/u
     let values = atom.split(sep).map(parseFloat)
     let operator = atom.match(sep)[0]
 
@@ -220,6 +221,7 @@ function calculate(atom, reduce = 0) {
 
 function reduceExp(atom, result) {
     exp = exp.replace(atom, result)
+    console.log(exp)
 }
 
 
