@@ -34,6 +34,9 @@ function init() {
 
     //equal sign
     document.querySelector('#equal').addEventListener('click', equate)
+
+    //AC
+    document.querySelector('#ac').addEventListener('click', flush)
 }
 
 // UTILITY
@@ -46,8 +49,13 @@ function write(input) {
     PROMPT.textContent = input
 }
 
-function flush() {
+function flush(mode='buffer') {
     buffer = ''
+    if (mode != 'buffer') {
+        numBuffer = []
+        opBuffer = []
+        write(0)
+    }
 }
 
 function countDigits(number, part = 'all') {
@@ -57,11 +65,6 @@ function countDigits(number, part = 'all') {
 
 function parseInput(input) {
     return parseFloat(input.match(/[^,]/g).join(''))
-}
-
-function clearInput() {
-    if (this.textContent) { }
-    writeBuffer('0')
 }
 
 function writeBuffer(input) {
@@ -155,7 +158,7 @@ function operate() {
 }
 
 function equate() {
-    
+
 }
 
 
