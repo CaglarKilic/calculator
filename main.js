@@ -3,6 +3,12 @@ const MAX_DIGIT = 9
 let buffer = ''
 let opBuffer = []
 let numBuffer = []
+const arith = {
+    '+': (a, b) => a + b,
+    '\u{2010}': (a, b) => a - b,
+    '*': (a, b) => a * b,
+    '/': (a, b) => a / b
+}
 
 function init() {
     // ------- Buttons -------
@@ -52,14 +58,18 @@ function parseInput(input) {
 
 function clearInput() {
     if (this.textContent) { }
-    writeInput('0')
+    writeBuffer('0')
 }
 
-function writeInput(input) {
-    let options = countDigits(input) > MAX_DIGIT ? { notation: 'scientific' } : {}
+function writeBuffer(input) {
     let float = parseInput(input)
     if (input.includes('.') && !input.includes('e')) { float = float.toFixed(countDigits(input, 'decimal')) }
-    buffer = float.toLocaleString('en-US', options)
+    buffer = toLocal(float)
+}
+
+function toLocal(input) {
+    let options = countDigits(input.toString()) > MAX_DIGIT ? { notation: 'scientific' } : {}
+    return input.toLocaleString('en-US', options)
 }
 
 function registerBuffers(op) {
@@ -82,13 +92,25 @@ function getLastOp() {
     }
 }
 
+function calc(mode = 'r', startIndex = 0) {
+    let lvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex]
+    let rvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex + 1]
+    let op = mode == 'w' ? opBuffer.splice(startIndex, 1)[0] : opBuffer[startIndex]
+
+    let result = arith[op](lvalue, rvalue)
+
+    if (mode == 'w') { startIndex ? numBuffer.push(result) : numBuffer.unshift(result) }
+
+    return result
+}
+
 
 // INPUT
 
 function addDigit() {
     let input = read()
     if (countDigits(input) == MAX_DIGIT) { return }
-    writeInput(input + this.textContent)
+    writeBuffer(input + this.textContent)
     write(buffer)
 }
 
@@ -105,7 +127,7 @@ function addRemoveMinusSign(event) {
         if (op && !buffer) { op.focus() }
         return
     }
-    
+
     let input = read()
     buffer = input[0] == '-' ? input.replace('-', '') : '-' + input
     write(buffer)
@@ -114,7 +136,19 @@ function addRemoveMinusSign(event) {
 // OPERATION
 
 function operate() {
-    registerBuffers(this.textContent)
+    if (this.textContent) { registerBuffers(this.textContent) }
+
+    if (opBuffer.length == 2) {
+        if (opBuffer[0].match(/[\*\/]/)) { write(calc('w')) }
+        else if (opBuffer[1].match(/[\*\/]/)) { write(numBuffer[1]) }
+        else { write(calc()) }
+    }
+
+    if (opBuffer.length == 3) {
+        if (opBuffer[1].match(/[\*\/]/)) { write(calc('w', 1)) }
+        else { write(calc('w')) }
+        operate()
+    }
 }
 
 
