@@ -31,6 +31,9 @@ function init() {
     let minusSign = document.querySelector('#negate')
     minusSign.addEventListener('focusin', addRemoveMinusSign)
     minusSign.addEventListener('click', addRemoveMinusSign)
+
+    //equal sign
+    document.querySelector('#equal').addEventListener('click', equate)
 }
 
 // UTILITY
@@ -149,6 +152,10 @@ function operate() {
         else { write(calc('w')) }
         operate()
     }
+}
+
+function equate() {
+    
 }
 
 
