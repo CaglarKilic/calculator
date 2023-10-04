@@ -49,7 +49,7 @@ function write(input) {
     PROMPT.textContent = input
 }
 
-function flush(mode='buffer') {
+function flush(mode = 'buffer') {
     buffer = ''
     if (mode != 'buffer') {
         numBuffer = []
@@ -61,6 +61,10 @@ function flush(mode='buffer') {
 function countDigits(number, part = 'all') {
     if (part == 'decimal') { return number.split('.')[1].length }
     return number.match(/\d/g).length
+}
+
+function checkPrecedence(sign) {
+    return sign.match(/[\*\/]/)
 }
 
 function parseInput(input) {
@@ -145,13 +149,13 @@ function operate() {
     if (this.textContent) { registerBuffers(this.textContent) }
 
     if (opBuffer.length == 2) {
-        if (opBuffer[0].match(/[\*\/]/)) { write(calc('w')) }
-        else if (opBuffer[1].match(/[\*\/]/)) { write(numBuffer[1]) }
+        if (checkPrecedence(opBuffer[0])) { write(calc('w')) }
+        else if (checkPrecedence(opBuffer[1])) { write(numBuffer[1]) }
         else { write(calc()) }
     }
 
     if (opBuffer.length == 3) {
-        if (opBuffer[1].match(/[\*\/]/)) { write(calc('w', 1)) }
+        if (checkPrecedence(opBuffer[1])) { write(calc('w', 1)) }
         else { write(calc('w')) }
         operate()
     }
