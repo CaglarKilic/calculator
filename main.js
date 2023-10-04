@@ -20,6 +20,11 @@ function init() {
     document.querySelector('#divide').addEventListener('click', operate)
     document.querySelector('#subtract').addEventListener('click', operate)
     document.querySelector('#multiply').addEventListener('click', operate)
+
+    //minus sign
+    let minusSign = document.querySelector('#negate')
+    minusSign.addEventListener('focusin', addRemoveMinusSign)
+    minusSign.addEventListener('click', addRemoveMinusSign)
 }
 
 // UTILITY
@@ -70,6 +75,13 @@ function registerBuffers(op) {
     }
 }
 
+function getActiveOp() {
+    let lastop = opBuffer[opBuffer.length - 1]
+    if (lastop) {
+        return [...document.querySelectorAll('.op')].filter((button) => button.textContent == lastop).pop()
+    }
+}
+
 
 // INPUT
 
@@ -87,6 +99,17 @@ function addDecimal() {
     write(buffer)
 }
 
+function addRemoveMinusSign(event) {
+    if (event.type == 'focusin') {
+        let op = getActiveOp()
+        if (op) { op.focus() }
+        return
+    }
+    
+    let input = read()
+    buffer = input[0] == '-' ? input.replace('-', '') : '-' + input
+    write(buffer)
+}
 
 // OPERATION
 
