@@ -75,7 +75,7 @@ function registerBuffers(op) {
     }
 }
 
-function getActiveOp() {
+function getLastOp() {
     let lastop = opBuffer[opBuffer.length - 1]
     if (lastop) {
         return [...document.querySelectorAll('.op')].filter((button) => button.textContent == lastop).pop()
@@ -101,8 +101,8 @@ function addDecimal() {
 
 function addRemoveMinusSign(event) {
     if (event.type == 'focusin') {
-        let op = getActiveOp()
-        if (op) { op.focus() }
+        let op = getLastOp()
+        if (op && !buffer) { op.focus() }
         return
     }
     
