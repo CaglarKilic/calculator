@@ -1,11 +1,13 @@
 const PROMPT = document.querySelector('p')
 const MAX_DIGIT = 9
-let buffer = ''
+let buffer = '0'
+let mem = null
+let lastop = null
 let opBuffer = []
 let numBuffer = []
 const arith = {
     '+': (a, b) => a + b,
-    '\u{2010}': (a, b) => a - b,
+    '-': (a, b) => a - b,
     '*': (a, b) => a * b,
     '/': (a, b) => a / b
 }
@@ -54,6 +56,8 @@ function flush(mode = 'buffer') {
     if (mode != 'buffer') {
         numBuffer = []
         opBuffer = []
+        mem = null
+        lastop = null
         write(0)
     }
 }
@@ -95,14 +99,7 @@ function registerBuffers(op) {
     }
 }
 
-function getLastOp() {
-    let lastop = opBuffer[opBuffer.length - 1]
-    if (lastop) {
-        return [...document.querySelectorAll('.op')].filter((button) => button.textContent == lastop).pop()
-    }
-}
-
-function calc(mode = 'r', startIndex = 0) {
+function reduce(mode = 'r', startIndex = 0) {
     let lvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex]
     let rvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex + 1]
     let op = mode == 'w' ? opBuffer.splice(startIndex, 1)[0] : opBuffer[startIndex]
@@ -133,8 +130,7 @@ function addDecimal() {
 
 function addRemoveMinusSign(event) {
     if (event.type == 'focusin') {
-        let op = getLastOp()
-        if (op && !buffer) { op.focus() }
+        if (lastop && !buffer) { lastop.focus() }
         return
     }
 
@@ -146,23 +142,41 @@ function addRemoveMinusSign(event) {
 // OPERATION
 
 function operate() {
-    if (this.textContent) { registerBuffers(this.textContent) }
-
-    if (opBuffer.length == 2) {
-        if (checkPrecedence(opBuffer[0])) { write(calc('w')) }
-        else if (checkPrecedence(opBuffer[1])) { write(numBuffer[1]) }
-        else { write(calc()) }
+    if (this.textContent) {
+        mem = null
+        lastop = this
+        registerBuffers(this.textContent)
     }
 
-    if (opBuffer.length == 3) {
-        if (checkPrecedence(opBuffer[1])) { write(calc('w', 1)) }
-        else { write(calc('w')) }
+    if (opBuffer.length == 1 && numBuffer.length == 2) { write(reduce('w')) } // only helps function `equate`
+
+    if (numBuffer.length == 2) {
+        if (checkPrecedence(opBuffer[0])) { write(reduce('w')) }
+        else if (checkPrecedence(opBuffer[1])) { write(numBuffer[1]) }
+        else { write(reduce()) }
+    }
+
+    if (numBuffer.length == 3) {
+        if (checkPrecedence(opBuffer[1])) { write(reduce('w', 1)) }
+        else { write(reduce('w')) }
         operate()
     }
 }
 
 function equate() {
+    if (mem != null) {
+        write(buffer = arith[lastop.textContent](parseInput(PROMPT.textContent), mem).toString())
+        return
+    }
 
+    mem = parseInput(PROMPT.textContent)
+    numBuffer.push(mem)
+
+    if (opBuffer.length > 0) {
+        operate()
+    }
+
+    buffer = numBuffer.pop().toString()
 }
 
 
