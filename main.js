@@ -1,4 +1,7 @@
 const PROMPT = document.querySelector('p')
+const DEFAULT_INPUT_WIDTH = PROMPT.parentElement.offsetWidth
+const DEFAULT_INPUT_HEIGHT = PROMPT.offsetHeight
+const DEFAULT_FONT_SIZE = parseFloat(window.getComputedStyle(PROMPT).fontSize)
 const MAX_DIGIT = 9
 let buffer = ''
 let mem = null
@@ -52,6 +55,23 @@ function read() {
 
 function write(input) {
     PROMPT.textContent = input
+    adjustFontSize()
+}
+
+function adjustFontSize() {
+    const parent = PROMPT.parentElement
+
+    PROMPT.style.fontSize = DEFAULT_FONT_SIZE + 'px'
+
+    let j = 1
+    while (DEFAULT_INPUT_HEIGHT < PROMPT.offsetHeight) {
+        PROMPT.style.fontSize = (DEFAULT_FONT_SIZE - j++) + 'px'
+    }
+
+    let i = 1
+    while (DEFAULT_INPUT_WIDTH < parent.offsetWidth) {
+        PROMPT.style.fontSize = (DEFAULT_FONT_SIZE - i++) + 'px'
+    }
 }
 
 function flush(mode = 'buffer') {
@@ -67,17 +87,18 @@ function flush(mode = 'buffer') {
 
 function clickButton(event) {
     const key = event.key
-
+    
     for (button of document.querySelectorAll('button')) {
         if (key == button.dataset.key) {
+            event.preventDefault()
+            button.focus()
             button.click()
-            button.active()
         }
     }
 }
 
 function countDigits(number) {
-    const parts = number.split('.').map((part) => part.length)
+    const parts = number.replace('-', '').split('.').map((part) => part.length)
     return {
         decimal: parts[1] || 0,
         integer: parts[0],
@@ -99,16 +120,13 @@ function format(input) {
     const endDot = input.match(/\.$/) == null ? '' : '.'
     const fixed = number.toFixed(MAX_DIGIT - 1).replace(/0*$/, '')
 
-    console.log(fixed)
-
-    
     if (digitCounts.all <= MAX_DIGIT && !input.includes('e')) {
         return number.toLocaleString('en-US', { minimumFractionDigits: digitCounts.decimal }) + endDot
     }
 
-    if (fixed.match(/[^0\.]+$/)) { return fixed }
+    if (fixed.match(/[^0\.]+$/) && !fixed.includes('e')) { return fixed }
 
-    if (digitCounts.integer > MAX_DIGIT || fixed == '0.') {
+    if (digitCounts.integer > MAX_DIGIT || fixed == '0.' || fixed.includes('e')) {
         return number.toExponential(MAX_DIGIT - 3).replace(/\.?0*(?=e)/, '')
     }
 }
@@ -134,7 +152,6 @@ function reduce(mode = 'r', startIndex = 0) {
     const result = arith[op](lvalue, rvalue)
 
     if (mode == 'w') { startIndex ? numBuffer.push(result) : numBuffer.unshift(result) }
-
     return format(result.toString())
 }
 
@@ -163,7 +180,7 @@ function addRemoveMinusSign(event) {
 
     let input = read() || '0'
     buffer = input[0] == '-' ? input.replace('-', '') : '-' + input
-    write(buffer)
+    write(format(buffer))
 }
 
 // OPERATION
@@ -193,10 +210,12 @@ function operate() {
 function equate() {
     if (mem != null) {
         buffer = arith[lastop.textContent](parseInput(buffer), mem).toString()
-        console.log(buffer)
         write(format(buffer))
         return
     }
+
+    
+    if (opBuffer.length == 0) { return }
 
     mem = parseInput(PROMPT.textContent)
     numBuffer.push(mem)
