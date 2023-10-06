@@ -82,11 +82,19 @@ function parseInput(input) {
 function format(input) {
     const number = parseFloat(input)
     const digitCounts = countDigits(input)
-    const fixed = number.toFixed(MAX_DIGIT - 1).replace(/0*$/, '')
     const endDot = input.match(/\.$/) == null ? '' : '.'
+    const fixed = number.toFixed(MAX_DIGIT - 1).replace(/0*$/, '')
 
-    if (digitCounts.all <= MAX_DIGIT) {
-        return number.toLocaleString('en-US', {minimumFractionDigits: digitCounts.decimal}) + endDot
+    console.log(fixed)
+
+    if (fixed.match(/[^0\.]$/)) { return fixed }
+
+    if (digitCounts.all <= MAX_DIGIT && !input.includes('e')) {
+        return number.toLocaleString('en-US', { minimumFractionDigits: digitCounts.decimal }) + endDot
+    }
+
+    if (digitCounts.integer > MAX_DIGIT || fixed == '0.') {
+        return number.toExponential(MAX_DIGIT - 3).replace(/\.?0*(?=e)/, '')
     }
 }
 
@@ -112,7 +120,7 @@ function reduce(mode = 'r', startIndex = 0) {
 
     if (mode == 'w') { startIndex ? numBuffer.push(result) : numBuffer.unshift(result) }
 
-    return result
+    return format(result.toString())
 }
 
 
@@ -120,14 +128,14 @@ function reduce(mode = 'r', startIndex = 0) {
 
 function addDigit() {
     let input = read()
-    if (countDigits(input) == MAX_DIGIT) { return }
+    if (countDigits(input).all == MAX_DIGIT) { return }
     buffer = input + this.textContent
     write(format(buffer))
 }
 
 function addDecimal() {
     let input = read()
-    if (countDigits(input) == MAX_DIGIT || input.includes('.')) { return }
+    if (countDigits(input).all == MAX_DIGIT || input.includes('.')) { return }
     buffer = input + this.textContent
     write(format(buffer))
 }
@@ -169,7 +177,9 @@ function operate() {
 
 function equate() {
     if (mem != null) {
-        write(buffer = arith[lastop.textContent](parseInput(PROMPT.textContent), mem).toString())
+        buffer = arith[lastop.textContent](parseInput(buffer), mem).toString()
+        console.log(buffer)
+        write(format(buffer))
         return
     }
 
