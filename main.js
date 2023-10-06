@@ -47,6 +47,7 @@ function init() {
     document.addEventListener('keydown', clickButton)
 
     //Backspace
+    document.querySelector('#backspace').addEventListener('click', backspace)
 }
 
 // UTILITY
