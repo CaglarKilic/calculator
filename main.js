@@ -1,6 +1,6 @@
 const PROMPT = document.querySelector('p')
 const MAX_DIGIT = 9
-let buffer = '0'
+let buffer = ''
 let mem = null
 let lastop = null
 let opBuffer = []
@@ -44,7 +44,7 @@ function init() {
 // UTILITY
 
 function read() {
-    return buffer || '0'
+    return buffer
 }
 
 function write(input) {
@@ -62,9 +62,13 @@ function flush(mode = 'buffer') {
     }
 }
 
-function countDigits(number, part = 'all') {
-    if (part == 'decimal') { return number.split('.')[1].length }
-    return number.match(/\d/g).length
+function countDigits(number) {
+    const parts = number.split('.').map((part) => part.length)
+    return {
+        decimal: parts[1] || 0,
+        integer: parts[0],
+        all: parts[0] + (parts[1] || 0)
+    }
 }
 
 function checkPrecedence(sign) {
@@ -75,15 +79,15 @@ function parseInput(input) {
     return parseFloat(input.match(/[^,]/g).join(''))
 }
 
-function writeBuffer(input) {
-    let float = parseInput(input)
-    if (input.includes('.') && !input.includes('e')) { float = float.toFixed(countDigits(input, 'decimal')) }
-    buffer = toLocal(float)
-}
+function format(input) {
+    const number = parseFloat(input)
+    const digitCounts = countDigits(input)
+    const fixed = number.toFixed(MAX_DIGIT - 1).replace(/0*$/, '')
+    const endDot = input.match(/\.$/) == null ? '' : '.'
 
-function toLocal(input) {
-    let options = countDigits(input.toString()) > MAX_DIGIT ? { notation: 'scientific' } : {}
-    return input.toLocaleString('en-US', options)
+    if (digitCounts.all <= MAX_DIGIT) {
+        return number.toLocaleString('en-US', {minimumFractionDigits: digitCounts.decimal}) + endDot
+    }
 }
 
 function registerBuffers(op) {
@@ -100,11 +104,11 @@ function registerBuffers(op) {
 }
 
 function reduce(mode = 'r', startIndex = 0) {
-    let lvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex]
-    let rvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex + 1]
-    let op = mode == 'w' ? opBuffer.splice(startIndex, 1)[0] : opBuffer[startIndex]
+    const lvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex]
+    const rvalue = mode == 'w' ? numBuffer.splice(startIndex, 1)[0] : numBuffer[startIndex + 1]
+    const op = mode == 'w' ? opBuffer.splice(startIndex, 1)[0] : opBuffer[startIndex]
 
-    let result = arith[op](lvalue, rvalue)
+    const result = arith[op](lvalue, rvalue)
 
     if (mode == 'w') { startIndex ? numBuffer.push(result) : numBuffer.unshift(result) }
 
@@ -117,15 +121,15 @@ function reduce(mode = 'r', startIndex = 0) {
 function addDigit() {
     let input = read()
     if (countDigits(input) == MAX_DIGIT) { return }
-    writeBuffer(input + this.textContent)
-    write(buffer)
+    buffer = input + this.textContent
+    write(format(buffer))
 }
 
 function addDecimal() {
     let input = read()
     if (countDigits(input) == MAX_DIGIT || input.includes('.')) { return }
     buffer = input + this.textContent
-    write(buffer)
+    write(format(buffer))
 }
 
 function addRemoveMinusSign(event) {
@@ -134,7 +138,7 @@ function addRemoveMinusSign(event) {
         return
     }
 
-    let input = read()
+    let input = read() || '0'
     buffer = input[0] == '-' ? input.replace('-', '') : '-' + input
     write(buffer)
 }
