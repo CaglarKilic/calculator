@@ -39,6 +39,9 @@ function init() {
 
     //AC
     document.querySelector('#ac').addEventListener('click', flush)
+
+    // Keyboard
+    document.addEventListener('keydown', clickButton)
 }
 
 // UTILITY
@@ -59,6 +62,17 @@ function flush(mode = 'buffer') {
         mem = null
         lastop = null
         write(0)
+    }
+}
+
+function clickButton(event) {
+    const key = event.key
+
+    for (button of document.querySelectorAll('button')) {
+        if (key == button.dataset.key) {
+            button.click()
+            button.active()
+        }
     }
 }
 
@@ -87,11 +101,12 @@ function format(input) {
 
     console.log(fixed)
 
-    if (fixed.match(/[^0\.]$/)) { return fixed }
-
+    
     if (digitCounts.all <= MAX_DIGIT && !input.includes('e')) {
         return number.toLocaleString('en-US', { minimumFractionDigits: digitCounts.decimal }) + endDot
     }
+
+    if (fixed.match(/[^0\.]+$/)) { return fixed }
 
     if (digitCounts.integer > MAX_DIGIT || fixed == '0.') {
         return number.toExponential(MAX_DIGIT - 3).replace(/\.?0*(?=e)/, '')
@@ -134,7 +149,7 @@ function addDigit() {
 }
 
 function addDecimal() {
-    let input = read()
+    let input = read() || '0'
     if (countDigits(input).all == MAX_DIGIT || input.includes('.')) { return }
     buffer = input + this.textContent
     write(format(buffer))
