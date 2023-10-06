@@ -43,8 +43,10 @@ function init() {
     //AC
     document.querySelector('#ac').addEventListener('click', flush)
 
-    // Keyboard
+    //Keyboard
     document.addEventListener('keydown', clickButton)
+
+    //Backspace
 }
 
 // UTILITY
@@ -87,7 +89,7 @@ function flush(mode = 'buffer') {
 
 function clickButton(event) {
     const key = event.key
-    
+
     for (button of document.querySelectorAll('button')) {
         if (key == button.dataset.key) {
             event.preventDefault()
@@ -183,6 +185,10 @@ function addRemoveMinusSign(event) {
     write(format(buffer))
 }
 
+function backspace() {
+
+}
+
 // OPERATION
 
 function operate() {
@@ -214,7 +220,6 @@ function equate() {
         return
     }
 
-    
     if (opBuffer.length == 0) { return }
 
     mem = parseInput(PROMPT.textContent)
