@@ -189,6 +189,7 @@ function addRemoveMinusSign(event) {
 function backspace() {
     if (buffer.includes('e-')) { buffer *= 10 }
     else if (buffer.includes('e+')) { buffer /= 10 }
+    else if (buffer.match(/\-\d/)) { buffer = '0' }
     else { buffer = buffer.slice(0, -1) || '0' }
     write(format(buffer.toString()))
 }
